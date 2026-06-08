@@ -1,0 +1,29 @@
+{
+  "name": "welcome-to-america",
+  "version": "1.0.0",
+  "description": "Simple and supportive app that acts as a one-stop resource for anyone navigating the US immigration process.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently \"npm run dev --prefix client\" \"npm run dev --prefix server\"",
+    "build": "npm run build --prefix client",
+    "lint": "npm run lint --prefix client && npm run lint --prefix server",
+    "install-all": "npm install --prefix client && npm install --prefix server",
+    "postinstall": "npm run install-all"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/juanms23/welcome-to-america.git"
+  },
+  "keywords": [],
+  "author": "Juan Carlos Muratalla-Sanchez <murataj2@wwu.edu>",
+  "license": "MIT",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/juanms23/welcome-to-america/issues"
+  },
+  "homepage": "https://github.com/juanms23/welcome-to-america#readme",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
