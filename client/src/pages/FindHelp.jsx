@@ -1,119 +1,208 @@
 import { useState } from "react";
+import ResourceCard from "../components/ResourceCard";
 
-function FindHelp() {
+const CATEGORIES = [
+  { value: "all",          label: "All" },
+  { value: "legal",        label: "Legal Aid" },
+  { value: "healthcare",   label: "Healthcare" },
+  { value: "mental-health",label: "Mental Health" },
+  { value: "employment",   label: "Employment" },
+  { value: "education",    label: "Education" },
+  { value: "food",         label: "Food" },
+  { value: "housing",      label: "Housing" },
+  { value: "general",      label: "General Services" },
+];
 
-// the useState in react creates variables with setter methods and default values
-  const [zip, setZip] = useState("");
-  const [results, setResults] = useState([]);
+export default function FindHelp() {
+  const [zip, setZip]               = useState("");
+  const [category, setCategory]     = useState("all");
+  const [scope, setScope]           = useState("state");
+  const [results, setResults]       = useState([]);
   const [hasSearched, setHasSearched] = useState(false);
-  const [error, setError] = useState("");
+  const [loading, setLoading]       = useState(false);
+  const [error, setError]           = useState("");
 
-  
-    /* this is a mock "database" of made up resources, will need to be replaced
-       by a more robust local array, a query to some remote real database, or an
-       API call to google maps or something */
-  const resources = [
-    {
-      name: "Immigration Legal Aid Center",
-      zip: "98225",
-      description: "Free legal help for immigration cases.",
-    },
-    {
-      name: "Community Resource Hub",
-      zip: "98372",
-      description: "Multilingual support and guidance.",
-    },
-    {
-      name: "Migrant Support Center",
-      zip: "90210",
-      description: "Help with forms, work permits, and more.",
-    },
-    {
-      name: "Neighborhood Immigration Clinic",
-      zip: "30303",
-      description: "Free consultations and documentation help.",
-    },
-  ];
+  async function fetchResources(overrideZip, overrideCategory) {
+    const zipVal = overrideZip      !== undefined ? overrideZip      : zip;
+    const catVal = overrideCategory !== undefined ? overrideCategory : category;
 
-  function handleSearch() {
-    const trimmedZip = zip.trim();
+    setLoading(true);
+    setError("");
+
+    try {
+      const params = new URLSearchParams();
+      if (zipVal && zipVal.trim()) params.set("zip", zipVal.trim());
+      if (catVal && catVal !== "all") params.set("category", catVal);
+      if (zipVal && zipVal.trim()) params.set("scope", scope);
+
+      const res = await fetch(`/api/resources?${params}`);
+      if (!res.ok) throw new Error("Server error");
+      const data = await res.json();
+      setResults(data);
+      setHasSearched(true);
+    } catch {
+      setError("Could not connect to the resource server. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleSearch(e) {
+    e.preventDefault();
     const zipRegex = /^\d{5}$/;
-
-    if (!zipRegex.test(trimmedZip)) {
+    if (zip.trim() && !zipRegex.test(zip.trim())) {
       setError("Please enter a valid 5-digit zip code.");
-      setResults([]);
-      setHasSearched(false);
       return;
     }
+    fetchResources();
+  }
 
-    const filtered = resources.filter((r) => r.zip === trimmedZip);
-    setResults(filtered);
-    setHasSearched(true);
-    setError("");
-  };
+  function handleCategoryClick(cat) {
+    setCategory(cat);
+    if (hasSearched) fetchResources(undefined, cat);
+  }
 
   function handleShowAll() {
-    setResults(resources);
-    setHasSearched(true);
-    setError("");
-  };
-  
-  return (
-    <div className="min-h-screen p-6 max-w-2xl mx-auto">
-      <h1 className="text-3xl text-center font-bold mb-6">Find Help</h1>
-      <p className="text-center mb-6">
-        Enter your zip code to find immigration resources near you, or view all available resources.
-      </p>
+    setZip("");
+    setCategory("all");
+    fetchResources("", "all");
+  }
 
-      <div className="flex gap-2 justify-center mb-4 flex-wrap">
-        <input
-          type="text"
-          placeholder="Enter zip code"
-          value={zip}
-          onChange={(e) => setZip(e.target.value)}
-          className="border border-gray-400 rounded px-4 py-2 w-48"
-        />
-        <button
-          onClick={handleSearch}
-          className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition"
-        >
-          Search
-        </button>
-        <button
-          onClick={handleShowAll}
-          className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition"
-        >
-          Show All
-        </button>
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero search bar */}
+      <div className="bg-white border-b border-gray-200 px-4 py-8">
+        <div className="max-w-2xl mx-auto">
+          <h1 className="text-3xl font-bold text-center mb-2 text-slate-900">
+            Find Help Near You
+          </h1>
+          <p className="text-center text-gray-600 mb-6">
+            Search for immigration support organizations by zip code, or browse by service type.
+          </p>
+
+          <form onSubmit={handleSearch} className="flex gap-2">
+            <input
+              type="text"
+              inputMode="numeric"
+              placeholder="Enter zip code (e.g. 98104)"
+              value={zip}
+              onChange={(e) => setZip(e.target.value)}
+              className="flex-1 border border-gray-300 rounded-lg px-4 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-emerald-400"
+            />
+            <button
+              type="submit"
+              className="bg-emerald-600 text-white px-5 py-2.5 rounded-lg hover:bg-emerald-700 transition font-semibold whitespace-nowrap"
+            >
+              Search
+            </button>
+            <button
+              type="button"
+              onClick={handleShowAll}
+              className="bg-white border border-gray-300 text-gray-700 px-4 py-2.5 rounded-lg hover:bg-gray-50 transition font-medium whitespace-nowrap"
+            >
+              Show All
+            </button>
+          </form>
+
+          {/* Scope toggle — only visible when zip is filled */}
+          {zip.trim() && (
+            <div className="flex items-center gap-3 mt-3 text-sm text-gray-600">
+              <span>Search radius:</span>
+              <label className="flex items-center gap-1 cursor-pointer">
+                <input
+                  type="radio"
+                  value="exact"
+                  checked={scope === "exact"}
+                  onChange={() => setScope("exact")}
+                  className="accent-emerald-600"
+                />
+                Exact zip only
+              </label>
+              <label className="flex items-center gap-1 cursor-pointer">
+                <input
+                  type="radio"
+                  value="state"
+                  checked={scope === "state"}
+                  onChange={() => setScope("state")}
+                  className="accent-emerald-600"
+                />
+                Statewide
+              </label>
+            </div>
+          )}
+
+          {error && <p className="text-red-600 text-sm mt-3 text-center">{error}</p>}
+        </div>
       </div>
 
-      {/* text that pops up when zip code is invalid */}
-      {error && <p className="text-center text-red-500 mb-6">{error}</p>}
-
-      {/* display search results */}
-      {results.length > 0 && (
-        <div className="space-y-6">
-          {results.map((res, index) => (
-            <div
-              key={index}
-              className="border border-gray-300 rounded p-4 shadow-sm"
+      {/* Category pills */}
+      <div className="bg-white border-b border-gray-200 px-4 py-3 overflow-x-auto">
+        <div className="flex gap-2 max-w-5xl mx-auto min-w-max">
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat.value}
+              onClick={() => handleCategoryClick(cat.value)}
+              className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition ${
+                category === cat.value
+                  ? "bg-emerald-600 text-white shadow-sm"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
             >
-              <h2 className="text-xl font-semibold">{res.name}</h2>
-              <p className="text-gray-700">{res.description}</p>
-              <p className="text-sm text-gray-500 mt-1">Zip code: {res.zip}</p>
-            </div>
+              {cat.label}
+            </button>
           ))}
         </div>
-      )}
+      </div>
 
-      {/* text that pops up when there are no results found */}
-      {hasSearched && results.length === 0 && !error && (
-        <p className="text-center text-gray-500">
-          No resources found for zip code {zip}.
+      {/* Results area */}
+      <div className="max-w-5xl mx-auto px-4 py-8">
+        {loading && (
+          <div className="flex justify-center items-center py-16 gap-3 text-gray-500">
+            <svg className="animate-spin h-6 w-6 text-emerald-600" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+            </svg>
+            Searching for resources…
+          </div>
+        )}
+
+        {!loading && hasSearched && results.length === 0 && (
+          <div className="text-center py-16 text-gray-500">
+            <p className="text-lg font-medium mb-2">No resources found.</p>
+            <p className="text-sm">
+              Try switching to &ldquo;Statewide&rdquo; search, clearing the zip code, or choosing a different category.
+            </p>
+          </div>
+        )}
+
+        {!loading && !hasSearched && (
+          <div className="text-center py-16 text-gray-400">
+            <p className="text-lg">Enter a zip code or click <strong>Show All</strong> to browse organizations.</p>
+          </div>
+        )}
+
+        {!loading && results.length > 0 && (
+          <>
+            <p className="text-sm text-gray-500 mb-4">
+              Showing <strong>{results.length}</strong> organization{results.length !== 1 ? "s" : ""}
+              {zip.trim() ? ` near ${zip.trim()}` : ""}
+              {category !== "all" ? ` · ${CATEGORIES.find((c) => c.value === category)?.label}` : ""}
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {results.map((r) => (
+                <ResourceCard key={r.id} resource={r} />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Footer note */}
+      <div className="max-w-5xl mx-auto px-4 pb-12 text-center">
+        <p className="text-xs text-gray-400">
+          Resource listings are curated for informational purposes. Always verify contact information directly with the organization. If you are in crisis, call or text <strong>988</strong>.
         </p>
-      )}
+      </div>
     </div>
   );
 }
-
-export default FindHelp;

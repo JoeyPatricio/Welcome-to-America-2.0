@@ -1,82 +1,87 @@
 import { useState, useEffect } from "react";
 import LinkButton from "../components/LinkButton";
 
+const alerts = [
+  "Update: changes to immigration policy in effect from October 2025",
+  "Learn more about the new alien registration requirements",
+  "Healthcare resources are now available for 2025",
+];
+
+const topicGroups = [
+  {
+    title: "Immigration",
+    links: [
+      { label: "Registration",   to: "/registration"   },
+      { label: "Green Cards",    to: "/green-cards"    },
+      { label: "Legal Support",  to: "/legal-support"  },
+    ],
+  },
+  {
+    title: "Work & Life",
+    links: [
+      { label: "Driver's Licenses",      to: "/drivers-licenses"      },
+      { label: "Government Assistance",  to: "/government-assistance" },
+      { label: "Employment",             to: "/employment"            },
+    ],
+  },
+  {
+    title: "Health",
+    links: [
+      { label: "Mental Health",    to: "/mental-health"      },
+      { label: "Healthcare",       to: "/healthcare"         },
+      { label: "Reproductive",     to: "/reproductive-health"},
+    ],
+  },
+  {
+    title: "Education",
+    links: [
+      { label: "Forms & Aid",  to: "/forms"        },
+      { label: "K–12",         to: "/k-12"         },
+      { label: "Undocumented", to: "/undocumented" },
+    ],
+  },
+];
+
 export default function Home() {
-  const bannerMessages = [
-    "Update: changes to immigration policy in effect from October 2025",
-    "Learn more about the new alien registration requirements",
-    "Healthcare resources are now available for 2025",
-  ];
-  const [bannerIndex, setBannerIndex] = useState(0);
+  const [alertIndex, setAlertIndex] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setBannerIndex((prev) => (prev + 1) % bannerMessages.length);
-    }, 15000); // Change message every 15 seconds
-    return () => clearInterval(interval);
-  }, [bannerMessages.length]);
-
-  const topics = [
-    {
-      title: "Immigration",
-      buttons: [
-        { label: "Registration", to: "/Registration" },
-        { label: "Green Cards", to: "/Green-cards" },
-        { label: "Legal Support", to: "/Legal-support" },
-      ],
-    },
-    {
-      title: "Work & Life",
-      buttons: [
-        { label: "Driver's Licenses", to: "/Drivers-licenses" },
-        { label: "Government Assistance", to: "/Government-assistance" },
-        { label: "Employment", to: "/Employment" },
-      ],
-    },
-    {
-      title: "Health",
-      buttons: [
-        { label: "Mental Health", to: "/Mental-health" },
-        { label: "Healthcare", to: "/Healthcare" },
-        { label: "Reproductive", to: "/Reproductive-health" },
-      ],
-    },
-    {
-      title: "Education",
-      buttons: [
-        { label: "Financial Aid", to: "/Financial-aid" },
-        { label: "K-12", to: "/K-12" },
-        { label: "Undocumented", to: "/Undocumented" },
-      ],
-    },
-  ];
+    const t = setInterval(() => setAlertIndex((i) => (i + 1) % alerts.length), 12000);
+    return () => clearInterval(t);
+  }, []);
 
   return (
-    <div className="min-h-screen p-3">
-      <div className="w-full bg-emerald-200 text-emerald-900 font-semibold text-center py-10 rounded mb-8 shadow">
-        {bannerMessages[bannerIndex]}
+    <div className="min-h-screen p-6">
+      {/* Alert banner */}
+      <div className="bg-emerald-100 border border-emerald-300 rounded-xl p-4 mb-8 text-center text-emerald-900 font-medium max-w-3xl mx-auto">
+        {alerts[alertIndex]}
       </div>
 
-      <h1 className="text-5xl font-serif font-bold text-center mb-4">
+      <h1 className="text-4xl text-center font-bold mb-4 font-[Merriweather]">
         Welcome to America
       </h1>
-      <p className="text-base font-sans text-center mb-8">
-        Find resources and information to help you navigate the immigrations process
+      <p className="max-w-2xl mx-auto mb-10 text-center text-lg text-gray-600">
+        Free resources to help immigrants navigate life in the United States.
       </p>
 
-      {topics.map((topic, index) => (
-        <div key={index} className="mb-10">
-          <h2 className="text-xl text-center font-semibold">{topic.title}</h2>
-          <hr className="my-4 border-gray-300" />
-          <div className="flex gap-4 flex-wrap justify-center items-center">
-            {topic.buttons.map((btn, idx) => (
-              <LinkButton key={idx} to={btn.to}>
-                {btn.label}
-              </LinkButton>
-            ))}
+      <div className="max-w-5xl mx-auto space-y-10">
+        {topicGroups.map((group) => (
+          <div key={group.title}>
+            <h2 className="text-2xl font-semibold mb-4 text-gray-800">{group.title}</h2>
+            <div className="flex flex-wrap gap-3">
+              {group.links.map((link) => (
+                <LinkButton key={link.to} to={link.to}>
+                  {link.label}
+                </LinkButton>
+              ))}
+            </div>
           </div>
+        ))}
+
+        <div className="pt-4">
+          <LinkButton to="/find_help">Find Help Near You</LinkButton>
         </div>
-      ))}
+      </div>
     </div>
   );
 }
