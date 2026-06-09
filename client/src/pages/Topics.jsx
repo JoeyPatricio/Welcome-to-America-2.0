@@ -37,25 +37,38 @@ const sections = [
 
 export default function Topics() {
   return (
-    <div className="min-h-screen p-6 max-w-4xl mx-auto">
-      <h1 className="text-3xl text-center font-bold mb-4">All Topics</h1>
-      <p className="text-center text-gray-600 mb-8">Browse resources by category.</p>
+    <div className="max-w-4xl mx-auto px-4 py-12">
+      <h1 className="text-3xl font-[Merriweather] font-bold text-slate-900 text-center mb-2">
+        All Topics
+      </h1>
+      <p className="text-center text-gray-500 mb-10">
+        Browse resources by category.
+      </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {sections.map((section) => (
-          <div key={section.title}>
-            <h2 className="text-xl font-semibold mb-3 text-gray-800 border-b pb-2">{section.title}</h2>
-            <div className="flex flex-wrap gap-3">
+          <div
+            key={section.title}
+            className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6"
+          >
+            <h2 className="text-base font-bold text-slate-800 mb-4 pb-3 border-b border-gray-100">
+              {section.title}
+            </h2>
+            <ul className="space-y-2">
               {section.links.map((link) => (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  className="block min-w-[10rem] px-4 py-3 bg-emerald-200 text-emerald-900 rounded-xl text-lg font-semibold text-center shadow hover:bg-emerald-100 transition"
-                >
-                  {link.label}
-                </Link>
+                <li key={link.to}>
+                  <Link
+                    to={link.to}
+                    className="flex items-center justify-between text-sm text-slate-700 hover:text-emerald-700 font-medium py-1.5 px-2 rounded-lg hover:bg-emerald-50 transition group"
+                  >
+                    {link.label}
+                    <svg className="h-4 w-4 text-gray-300 group-hover:text-emerald-500 transition" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         ))}
       </div>

@@ -1,6 +1,5 @@
 import LinkButton from "../components/LinkButton";
 
-// Stage 2: plain layout, section headers without colored bands
 const sections = [
   {
     title: "Most Accessed",
@@ -42,17 +41,21 @@ const sections = [
 
 export default function Forms() {
   return (
-    <div className="min-h-screen p-6 max-w-4xl mx-auto">
-      <h1 className="text-3xl text-center font-bold mb-4">USCIS Forms</h1>
-      <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
-        Key immigration forms organized by purpose. Click any form to open the official USCIS page.
+    <div className="max-w-4xl mx-auto px-4 py-12">
+      <h1 className="text-3xl font-[Merriweather] font-bold text-slate-900 text-center mb-2">
+        USCIS Forms
+      </h1>
+      <p className="text-center text-gray-500 mb-10">
+        Key immigration forms organized by purpose. Clicking any form opens the official USCIS page.
       </p>
 
       <div className="space-y-8">
         {sections.map((section) => (
-          <div key={section.title}>
-            <h2 className="text-xl font-semibold mb-3 text-gray-800 border-b pb-2">{section.title}</h2>
-            <div className="flex flex-wrap gap-3">
+          <div key={section.title} className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+            <div className={`px-6 py-3 ${section.color} font-semibold text-sm`}>
+              {section.title}
+            </div>
+            <div className="px-6 py-5 flex flex-wrap gap-3">
               {section.forms.map((form) => (
                 <LinkButton key={form.to} to={form.to}>
                   {form.label}
@@ -64,7 +67,7 @@ export default function Forms() {
       </div>
 
       <p className="text-center text-xs text-gray-400 mt-8">
-        All links go directly to official USCIS.gov pages.
+        All links go directly to official USCIS.gov pages. Always verify forms on uscis.gov before filing.
       </p>
     </div>
   );

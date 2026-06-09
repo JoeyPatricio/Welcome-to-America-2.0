@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
 
-export default function LinkButton({ to, children, className = "", ...props }) {
-  const base = `block min-w-[12rem] px-4 py-4 bg-emerald-200 text-emerald-900 rounded-xl text-xl font-semibold flex items-center justify-center text-center shadow hover:bg-emerald-100 transition ${className}`;
+export default function LinkButton({ to, children, className = "", variant = "primary", ...props }) {
+  const base =
+    variant === "primary"
+      ? `inline-flex items-center justify-center min-w-[11rem] px-5 py-3 bg-emerald-600 text-white rounded-xl text-sm font-semibold shadow-sm hover:bg-emerald-700 active:bg-emerald-800 transition ${className}`
+      : `inline-flex items-center justify-center min-w-[11rem] px-5 py-3 bg-white border border-gray-200 text-slate-700 rounded-xl text-sm font-semibold shadow-sm hover:bg-gray-50 active:bg-gray-100 transition ${className}`;
 
   const isExternal = typeof to === "string" && to.startsWith("http");
 

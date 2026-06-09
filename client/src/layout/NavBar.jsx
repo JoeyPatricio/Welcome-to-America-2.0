@@ -35,26 +35,29 @@ export default function NavBar() {
   }, []);
 
   const linkClass = ({ isActive }) =>
-    `text-xl font-[Merriweather] font-bold transition-colors ${
+    `text-sm font-semibold tracking-wide transition-colors px-1 py-0.5 ${
       isActive
-        ? "text-emerald-700 underline"
-        : "text-blue-600 hover:text-emerald-700 hover:underline"
+        ? "text-emerald-700 border-b-2 border-emerald-600"
+        : "text-slate-600 hover:text-emerald-700"
     }`;
 
   return (
     <div>
-      <nav className="bg-white shadow px-4 py-4">
+      {/* Emerald brand stripe */}
+      <div className="h-1 w-full bg-emerald-600" />
+
+      <nav className="bg-white shadow-sm px-4 py-3">
         <div className="max-w-6xl mx-auto flex items-center gap-8">
 
           {/* Logo */}
           <NavLink
             to="/"
             end
-            className="flex items-center gap-2 shrink-0"
+            className="flex items-center gap-2.5 shrink-0"
             onClick={() => setMenuOpen(false)}
           >
-            <img src="/app-icon.svg" alt="" className="h-8 w-8 -translate-y-1" aria-hidden="true" />
-            <span className="font-[Merriweather] font-bold text-blue-600 text-3xl leading-tight">
+            <img src="/app-icon.svg" alt="" className="h-7 w-7" aria-hidden="true" />
+            <span className="font-[Merriweather] font-bold text-emerald-800 text-lg leading-tight">
               Welcome to America
             </span>
           </NavLink>
