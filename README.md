@@ -1,6 +1,6 @@
 # Welcome to America 2.0
 
-A free, accessible resource hub helping immigrants and newcomers navigate life in the United States — rebuilt from the ground up as a full-stack 2.0 application.
+A free, accessible resource hub helping immigrants and newcomers navigate life in the United States — rebuilt from the ground up as a full-stack 2.0 application. (Research paper PDF available in repo)
 
 > **This project is a continuation of the original [Welcome to America](https://github.com/juanms23/welcome-to-america)** — a React SPA built by a team of CS students at Western Washington University. Version 2.0 expands on that foundation with a real backend, a searchable organization directory, and comprehensive step-by-step civic guides across all topic areas.
 
