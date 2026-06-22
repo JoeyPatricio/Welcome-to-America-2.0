@@ -1,14 +1,37 @@
 const express = require("express");
 const cors = require("cors");
-const path = require("path");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors());
+app.use(helmet());
+app.use(cors()); // Public read-only API — wildcard origin is intentional
 app.use(express.json());
 
+app.use(
+  "/api",
+  rateLimit({
+    windowMs: 60 * 1000,
+    max: 60,
+    standardHeaders: true,
+    legacyHeaders: false,
+  })
+);
+
 const resources = require("./data/resources.json");
+
+const VALID_CATEGORIES = new Set([
+  "legal",
+  "healthcare",
+  "mental-health",
+  "employment",
+  "education",
+  "food",
+  "housing",
+  "general",
+]);
 
 // GET /api/resources
 // Query params:
@@ -17,6 +40,14 @@ const resources = require("./data/resources.json");
 //   scope    — "exact" (default) | "state" (broaden to entire state)
 app.get("/api/resources", (req, res) => {
   const { zip, category, scope } = req.query;
+
+  if (zip && !/^\d{5}$/.test(zip.trim())) {
+    return res.status(400).json({ error: "Invalid zip code" });
+  }
+
+  if (category && category !== "all" && !VALID_CATEGORIES.has(category)) {
+    return res.status(400).json({ error: "Invalid category" });
+  }
 
   let results = resources;
 
@@ -73,6 +104,12 @@ app.get("/api/categories", (req, res) => {
     counts[r.category] = (counts[r.category] || 0) + 1;
   });
   res.json(counts);
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(err.status ?? 500).json({ error: "Internal server error" });
 });
 
 app.listen(PORT, () => {
